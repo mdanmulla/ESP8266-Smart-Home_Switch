@@ -1,0 +1,32 @@
+SMART HOME CONTROLLER — LOCAL DASHBOARD + BLYNK (NO HTTPS)
+
+This package contains the complete ESP8266 sketch and dashboard:
+- SmartHomeController/SmartHomeController.ino
+- SmartHomeController/webui.h
+- SmartHomeController/web-preview.html (preview only)
+- README.md (full setup and operating guide)
+
+Compatibility and fixes verified in source:
+- Blynk feedback guard `fromBlynk` is declared globally before use.
+- BLYNK_WRITE(V1..V6) callbacks set/reset the guard to prevent feedback loops.
+- Wi-Fi password is retained when the same SSID is saved with a blank password, including DHCP/static-IP changes.
+- Relay and switch GPIO arrays are unchanged.
+- Relay outputs remain active-LOW.
+
+Optimization measures already present in this firmware:
+- EEPROM state and energy writes are delayed/throttled instead of writing on every loop iteration.
+- Wi-Fi and Blynk reconnection use retry delays/backoff.
+- Blynk.run() is called only while connected.
+- HTTP client timeout is bounded.
+- The main loop services DNS, OTA, mDNS, HTTP, timers and yields to the ESP8266 scheduler.
+- Relay state changes are ignored when the requested state is already active.
+
+IMPORTANT:
+- This build serves the local dashboard over HTTP, not HTTPS.
+- Blynk remote control still requires a valid Blynk Auth Token and internet access.
+- Replace the Blynk token placeholder before compiling.
+- Change the ArduinoOTA password before enabling OTA on an untrusted network.
+- Use ESP8266 Arduino core 3.1.2 and install the Blynk library.
+- This package was checked for source consistency and ZIP integrity, but a full Arduino compile and physical hardware test were not possible in this environment. Do not interpret this note as a guarantee of zero compiler/runtime errors.
+
+Blynk control update: added a Status-page Connect/Disconnect control; Blynk connection attempts are queued after the HTTP response and bounded to 1200 ms. Automatic retry is once per 60 seconds after Wi-Fi is available, then every 120 seconds after a failed attempt. Disconnect disables automatic reconnect until Connect is pressed again. Category card shadow is now absent while OFF and category-colored only while ON.
